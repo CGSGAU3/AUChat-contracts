@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-              $ref: '#/components/schemas/AliveResponse'
+                $ref: '#/components/schemas/AliveResponse'
 
 components:
   schemas:
@@ -61,6 +61,6 @@ components:
           description: Локальное время на сервере
       example:
         status: online
-        started_at: 2025-11-13 03:57:49
+        started_at: "2025-11-13 03:57:49"
         timestamp: "2025-11-13 04:19:08"
 
