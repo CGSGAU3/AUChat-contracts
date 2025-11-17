@@ -115,4 +115,8 @@ components:
         message:
           type: string
           description: Сообщение ошибки
+      example:
+        status: error
+        error: bad_request
+        message: Exception while processing request!
           
