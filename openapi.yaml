@@ -20,6 +20,10 @@ tags:
   description: Получение информации о состоянии сервера
 - name: auth
   description: Запросы, связанные с учетными записями пользователей
+- name: users
+  description: Запросы, связанные с пользователями
+- name: messages
+  description: Запросы, связанные с сообщениями
 
 paths:
   /api/alive:
