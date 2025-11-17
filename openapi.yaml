@@ -36,6 +36,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AliveResponse'
+  /api/check_token:
+    post:
+      tags:
+      - system
+      summary: Получение информации о статусе токена
+      description: |
+        Получает информацию о наличии отправленного токена в базе данных активных сессий.
+        Возвращает JSON с одним полем - флагом наличия токена в базе.
+      operationId: check_token
+      responses:
+        '200':
+          description: Объект с флагом существования токена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenStatus'
+        '400':
+          description: Во время обработки запроса произошла ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/ErrorSchema'
 
 components:
   schemas:
@@ -64,3 +86,33 @@ components:
         started_at: "2025-11-13 03:57:49"
         timestamp: "2025-11-13 04:19:08"
 
+    TokenStatus:
+      type: object
+      required:
+      - check_status
+      properties:
+        check_status:
+          type: boolean
+          description: Флаг существования токена в базе данных
+      example:
+        check_status: true
+
+    ErrorSchema:
+      type: object
+      required:
+      - status
+      - error
+      - message
+      properties:
+        status:
+          type: string
+          enum:
+          - error
+          description: Статус запроса
+        error:
+          type: string
+          description: Название ошибки в HTTP-формулировке
+        message:
+          type: string
+          description: Сообщение ошибки
+          
