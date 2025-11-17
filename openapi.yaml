@@ -118,6 +118,292 @@ paths:
                 $ref: '#/components/schemas/ErrorSchema'
         '500':
           description: Произошла внутренняя ошибка сервера
+  /api/auth/logout:
+    post:
+      tags:
+      - auth
+      summary: Выход пользователя из системы
+      description: |
+        Завершает сессию пользователя и удаляет токен авторизации.
+        Требует заголовок Authorization-Token.
+      operationId: logout
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      responses:
+        '200':
+          description: Выход выполнен успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RawSuccess'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/users/me:
+    get:
+      tags:
+      - users
+      summary: Получение информации о текущем пользователе
+      description: |
+        Возвращает информацию о пользователе, соответствующем переданному токену.
+        Требует заголовок Authorization-Token.
+      operationId: getCurrentUser
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      responses:
+        '200':
+          description: Информация о пользователе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/users/online:
+    get:
+      tags:
+      - users
+      summary: Получение списка онлайн пользователей
+      description: |
+        Возвращает список пользователей, которые сейчас онлайн.
+        Требует заголовок Authorization-Token.
+      operationId: getOnlineUsers
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      responses:
+        '200':
+          description: Список онлайн пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnlineUsersResponse'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/users/count:
+    get:
+      tags:
+      - users
+      summary: Получение общего количества пользователей
+      description: |
+        Возвращает общее количество зарегистрированных пользователей.
+        Требует заголовок Authorization-Token.
+      operationId: getUsersCount
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      responses:
+        '200':
+          description: Количество пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountResponse'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/messages:
+    post:
+      tags:
+      - messages
+      summary: Отправка нового сообщения
+      description: |
+        Отправляет новое сообщение в чат от имени текущего пользователя.
+        Требует заголовок Authorization-Token.
+      operationId: sendMessage
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - message_text
+              properties:
+                message_text:
+                  type: string
+                  description: Текст сообщения
+              example:
+                message_text: Привет, мир!
+      responses:
+        '200':
+          description: Сообщение отправлено успешно
+        '400':
+          description: Ошибка в данных запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+    get:
+      tags:
+      - messages
+      summary: Получение последних сообщений
+      description: |
+        Возвращает последние сообщения из чата.
+        Требует заголовок Authorization-Token и параметр limit.
+      operationId: getLastMessages
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: Количество возвращаемых сообщений
+      responses:
+        '200':
+          description: Список сообщений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesResponse'
+        '400':
+          description: Отсутствует параметр limit или ошибка в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/messages/new:
+    get:
+      tags:
+      - messages
+      summary: Получение новых сообщений
+      description: |
+        Возвращает сообщения, отправленные после указанного ID.
+        Требует заголовок Authorization-Token и параметр after_id.
+      operationId: getNewMessages
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      - name: after_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+        description: ID сообщения, после которого нужно вернуть новые сообщения
+      responses:
+        '200':
+          description: Список новых сообщений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesResponse'
+        '400':
+          description: Отсутствует параметр after_id или ошибка в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /api/messages/count:
+    get:
+      tags:
+      - messages
+      summary: Получение общего количества сообщений
+      description: |
+        Возвращает общее количество сообщений в чате.
+        Требует заголовок Authorization-Token.
+      operationId: getMessagesCount
+      parameters:
+      - name: Authorization-Token
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Токен авторизации
+      responses:
+        '200':
+          description: Количество сообщений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountResponse'
+        '401':
+          description: Неверный или отсутствующий токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
 
 
 
@@ -259,6 +545,148 @@ components:
       example:
         status: success
         token: ABCDEFG
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID пользователя
+        login:
+          type: string
+          description: Логин пользователя
+        first_name:
+          type: string
+          description: Имя пользователя
+        last_name:
+          type: string
+          description: Фамилия пользователя
+        is_online:
+          type: boolean
+          description: Статус онлайн
+      example:
+        id: 1
+        login: "CGSGAU3"
+        first_name: "Андрей"
+        last_name: "Усиков"
+        is_online: true
+
+    OnlineUsersResponse:
+      type: object
+      required:
+      - total_online
+      - online_users
+      properties:
+        total_online:
+          type: integer
+          description: Общее количество онлайн пользователей
+        online_users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          description: Список онлайн пользователей
+      example:
+        total_online: 3
+        online_users:
+          - id: 1
+            login: "CGSGAU3"
+            first_name: "Андрей"
+            last_name: "Усиков"
+            is_online: true
+          - id: 2
+            login: "user2"
+            first_name: "Иван"
+            last_name: "Петров"
+            is_online: true
+
+    Message:
+      type: object
+      required:
+      - id
+      - user_id
+      - text
+      - timestamp
+      properties:
+        id:
+          type: integer
+          description: ID сообщения
+        user_id:
+          type: integer
+          description: ID пользователя, отправившего сообщение
+        text:
+          type: string
+          description: Текст сообщения
+        timestamp:
+          type: string
+          format: date-time
+          description: Время отправки сообщения
+        user_login:
+          type: string
+          description: Логин пользователя (опционально)
+        user_first_name:
+          type: string
+          description: Имя пользователя (опционально)
+        user_last_name:
+          type: string
+          description: Фамилия пользователя (опционально)
+      example:
+        id: 123
+        user_id: 1
+        text: "Привет, мир!"
+        timestamp: "2025-11-13 04:19:08"
+        user_login: "CGSGAU3"
+        user_first_name: "Андрей"
+        user_last_name: "Усиков"
+
+    MessagesResponse:
+      type: object
+      required:
+      - total_count
+      - messages
+      properties:
+        total_count:
+          type: integer
+          description: Общее количество возвращенных сообщений
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+          description: Список сообщений
+      example:
+        total_count: 2
+        messages:
+          - id: 123
+            user_id: 1
+            text: "Привет, мир!"
+            timestamp: "2025-11-13 04:19:08"
+            user_login: "CGSGAU3"
+            user_first_name: "Андрей"
+            user_last_name: "Усиков"
+          - id: 124
+            user_id: 2
+            text: "Привет!"
+            timestamp: "2025-11-13 04:20:15"
+            user_login: "user2"
+            user_first_name: "Иван"
+            user_last_name: "Петров"
+
+    CountResponse:
+      type: object
+      required:
+      - status
+      - count
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+          description: Статус запроса
+        count:
+          type: integer
+          description: Количество элементов
+      example:
+        status: success
+        count: 42
 
     ErrorSchema:
       type: object
