@@ -80,6 +80,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RawSuccess'
+        '400':
+          description: В данных содержится ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+  /api/auth/login:
+    post:
+      tags:
+      - auth
+      summary: Запрос на авторизацию пользователя
+      description: |
+        Отправляет запрос на авторизацию с заполненным логином и паролем.
+        Возвращает статус запроса и токен авторизации.
+      operationId: login
+      requestBody:
+        $ref: '#/components/bodies/LoginBody'
+      responses:
+        '200':
+          description: Токен авторизации и статус
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Такого пользователя не существует или в данных иная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '401':
+          description: Пароль неверный
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: Произошла внутренняя ошибка сервера
 
 
 
@@ -131,6 +169,27 @@ components:
               password: qwerty
               first_name: Андрей
               last_name: Усиков
+    
+    LoginBody:
+      required: true
+      description: Объект с данными пользователя для авторизации
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - login
+            - password
+            properties:
+              login:
+                type: string
+                description: Юзернейм пользователя
+              password:
+                type: string
+                description: Пароль пользователя
+            example:
+              login: CGSGAU3
+              password: qwerty
 
 
   schemas:
@@ -182,6 +241,24 @@ components:
           description: Статус запроса
       example:
         status: success
+
+    LoginResponse:
+      type: object
+      request:
+      - status
+      - auth_token
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+          description: Статус запроса
+        auth_token:
+          type: string
+          description: Токен для последующих взаимодействий с api
+      example:
+        status: success
+        token: ABCDEFG
 
     ErrorSchema:
       type: object
