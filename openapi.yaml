@@ -48,7 +48,7 @@ paths:
         Возвращает JSON с одним полем - флагом наличия токена в базе.
       operationId: check_token
       requestBody:
-        $ref: '#/components/bodies/TokenBody'
+        $ref: '#/components/requestBodies/TokenBody'
       responses:
         '200':
           description: Объект с флагом существования токена
@@ -72,7 +72,7 @@ paths:
         Возвращает статус запроса.
       operationId: register
       requestBody:
-        $ref: '#/components/bodies/RegisterBody'
+        $ref: '#/components/requestBodies/RegisterBody'
       responses:
         '200':
           description: Статус запроса
@@ -96,7 +96,7 @@ paths:
         Возвращает статус запроса и токен авторизации.
       operationId: login
       requestBody:
-        $ref: '#/components/bodies/LoginBody'
+        $ref: '#/components/requestBodies/LoginBody'
       responses:
         '200':
           description: Токен авторизации и статус
@@ -122,9 +122,8 @@ paths:
 
 
 components:
-  bodies:
+  requestBodies:
     TokenBody:
-      type: RequestBody
       required: true
       description: JSON с токеном, который надо проверить
       content:
@@ -141,7 +140,6 @@ components:
               token: ABCDEFG
 
     RegisterBody:
-      type: RequestBody
       required: true
       description: Объект с заполненными данными пользователя
       content:
@@ -173,7 +171,6 @@ components:
               last_name: Усиков
     
     LoginBody:
-      type: RequestBody
       required: true
       description: Объект с данными пользователя для авторизации
       content:
