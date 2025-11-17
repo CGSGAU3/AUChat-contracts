@@ -18,6 +18,8 @@ servers:
 tags:
 - name: system
   description: Получение информации о состоянии сервера
+- name: auth
+  description: Запросы, связанные с учетными записями пользователей
 
 paths:
   /api/alive:
@@ -45,6 +47,8 @@ paths:
         Получает информацию о наличии отправленного токена в базе данных активных сессий.
         Возвращает JSON с одним полем - флагом наличия токена в базе.
       operationId: check_token
+      requestBody:
+        $ref: '#/components/bodies/TokenBody'
       responses:
         '200':
           description: Объект с флагом существования токена
@@ -58,8 +62,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorSchema'
+  /api/auth/register:
+    post:
+      tags:
+      - auth
+      summary: Запрос на регистрацию нового пользователя
+      description: |
+        Отправляет запрос на регистрацию со всеми заполненными полями.
+        Возвращает статус запроса.
+      operationId: register
+      requestBody:
+        $ref: '#/components/bodies/RegisterBody'
+      responses:
+        '200':
+          description: Статус запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RawSuccess'
+
+
 
 components:
+  bodies:
+    TokenBody:
+      required: true
+      description: JSON с токеном, который надо проверить
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - token
+            properties:
+              token:
+                type: string
+                description: Токен, который надо проверить
+            example:
+              token: ABCDEFG
+
+    RegisterBody:
+      required: true
+      description: Объект с заполненными данными пользователя
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - login
+            - password
+            - first_name
+            - last_name
+            properties:
+              login:
+                type: string
+                description: Юзернейм пользователя
+              password:
+                type: string
+                description: Пароль пользователя
+              first_name:
+                type: string
+                description: Имя пользователя
+              last_name:
+                type: string
+                description: Фамилия пользователя
+            example:
+              login: CGSGAU3
+              password: qwerty
+              first_name: Андрей
+              last_name: Усиков
+
+
   schemas:
     AliveResponse:
       type: object
@@ -96,6 +169,19 @@ components:
           description: Флаг существования токена в базе данных
       example:
         check_status: true
+
+    RawSuccess:
+      type: object
+      request:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+          description: Статус запроса
+      example:
+        status: success
 
     ErrorSchema:
       type: object
